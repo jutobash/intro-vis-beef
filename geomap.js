@@ -6,7 +6,7 @@
 
     Promise.all([
         d3.json("./topo.json"),
-        d3.csv("./cities.csv")]).then((data) => { 
+        d3.csv("./cities.csv")]).then((data) => {
 
             const topology = data[0]; //we will keep topology
             const cities = data[1]; //cities will be changed to include information on state plants
@@ -27,21 +27,7 @@
 
             const topo = topojson.feature(topology, topology.objects.states)
 
-            const svg = d3.select("#geomap").append('g').attr('transform', 'translate(50,50)');
-
-            //tooltip mouse funcs
-            const mouseover = function (event, d) {
-                tooltip.style("opacity", 1)
-            }
-            var mousemove = function (event, d) {
-                tooltip
-                    .html(d.name)
-                    .style("left", (event.x) / 2 + "px")
-                    .style("top", (event.y) / 2 - 30 + "px")
-            }
-            var mouseleave = function (event, d) {
-                tooltip.style("opacity", 0)
-            }
+            const svg = d3.select("#geoCanvas").append('svg').attr("width", 800).attr("height", 800).attr('transform', 'translate(50,50)');
 
             //usmap
             svg.append("g")
@@ -54,9 +40,10 @@
                 .attr("opacity", .5)
                 .attr("stroke-width", ".75px")
 
-            //tooltip
-            const tooltip = d3.select("#geomap")
+            //Tooltip
+            const Tooltip = d3.select("#geoCanvas")
                 .append("div")
+                .style("position", "absolute")
                 .attr("class", "tooltip")
                 .style("opacity", 1)
                 .style("background-color", "white")
@@ -65,10 +52,25 @@
                 .style("border-radius", "5px")
                 .style("padding", "5px")
 
+            //Tooltip mouse funcs
+            const mouseover = function (event, d) {
+                Tooltip.style("opacity", 1)
+            }
+            var mousemove = function (event, d) {
+                Tooltip
+                    .html(d.name)
+                    .style("left", (event.x) + "px")
+                    .style("top", (event.y) - 50 + "px") 
+            }
+            var mouseleave = function (event, d) {
+                Tooltip.style("opacity", 0)
+            }
+
             //statepoints
             svg.selectAll("circle")
                 .data(cities)
                 .join("circle")
+                .attr("class", "circle")
                 .attr("stroke", "khaki")
                 .attr("stroke-width", "2px")
                 .attr("r", function () {

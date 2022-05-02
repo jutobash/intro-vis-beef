@@ -1,8 +1,8 @@
 # Getting Starting with Vanilla Template
 
 - `index.html` is where you include the D3 library, your D3 code, and any HTML 
-- `geomap.js` holds the map, tooltip, and barchart visualizations. It writes to the `#geomap` SVG element.
-- `cities.csv` is the data we're loading. It will be modified with state emission information. 
+- `scatterplot.js` is an example of a visualization you would create. It writes to the `#scatterplot` SVG element.
+- `cars.csv` is the data we're loading. It could be a JSON file or an API endpoint. 
 
 ## Running your code 
 
