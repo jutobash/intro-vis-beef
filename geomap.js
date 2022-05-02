@@ -8,6 +8,20 @@
         d3.json("./topo.json"),
         d3.csv("./cities.csv")]).then((data) => {
 
+            var data1 = [
+                { type: "consumption", value: 4 },
+                { type: "production", value: 16 }
+            ];
+
+            MARGINS = {
+                top: 20,
+                right: 20,
+                bottom: 20,
+                left: 100 // change this to something larger like 100
+            }
+
+            const width = 800;
+            const height = 400;
             const topology = data[0]; //we will keep topology
             const cities = data[1]; //cities will be changed to include information on state plants
 
@@ -21,13 +35,15 @@
                 .domain([1, 50])
                 .range([1, 10]);
 
-            var projection = d3.geoAlbersUsa().scale(700).translate([487.5, 305])
+            var projection = d3.geoAlbersUsa().scale(700).translate([width / 2, height / 2])
 
             var path = d3.geoPath(projection);
 
             const topo = topojson.feature(topology, topology.objects.states)
 
-            const svg = d3.select("#geoCanvas").append('svg').attr("width", 800).attr("height", 800).attr('transform', 'translate(50,50)');
+            const svg = d3.select("#geoCanvas").append('svg').attr("width", width).attr("height", height).attr('transform', 'translate(50,50)');
+
+            const barsvg = d3.select("#geoCanvas").append('svg').attr("width", width).attr("height", height);
 
             //usmap
             svg.append("g")
@@ -45,7 +61,7 @@
                 .append("div")
                 .style("position", "absolute")
                 .attr("class", "tooltip")
-                .style("opacity", 1)
+                .style("opacity", 0)
                 .style("background-color", "white")
                 .style("border", "solid")
                 .style("border-width", "2px")
@@ -60,10 +76,26 @@
                 Tooltip
                     .html(d.name)
                     .style("left", (event.x) + "px")
-                    .style("top", (event.y) - 50 + "px") 
+                    .style("top", (event.y) - 50 + "px")
             }
             var mouseleave = function (event, d) {
                 Tooltip.style("opacity", 0)
+            }
+
+            function update(data) { //updates bar graph based on point clicked
+
+                var u = barsvg.selectAll("rect")
+                    .data(data)
+
+                u
+                    .join("rect")
+                    .transition()
+                    .duration(1000)
+                    .attr("x", d => x(d.type))
+                    .attr("y", d => y(d.value))
+                    .attr("width", x.bandwidth())
+                    .attr("height", d => 300 - y(d.value))
+                    .attr("fill", d => d.type == "consumption" ? "red" : "blue")
             }
 
             //statepoints
@@ -73,10 +105,10 @@
                 .attr("class", "circle")
                 .attr("stroke", "khaki")
                 .attr("stroke-width", "2px")
-                .attr("r", function () {
+                .attr("r", function () { //double encoded based on emission
                     return radius(Math.floor(Math.random() * 50));
                 })
-                .attr("cx", function (d) {
+                .attr("cx", function (d) { //change lat long for plant locs
                     var lon = projection([d.longitude, d.latitude]);
                     return lon[0];
                 })
@@ -84,12 +116,34 @@
                     var lat = projection([d.longitude, d.latitude]);
                     return lat[1];
                 })
-                .attr("fill", function () {
+                .attr("fill", function () { // squale sequential based on emission double encoded with "r"
                     return heats(Math.floor(Math.random() * 50));
                 })
                 .on("mouseover", mouseover)
                 .on("mousemove", mousemove)
                 .on("mouseleave", mouseleave)
+                .on("click", function () { // change data to data.name of the circle
+                    update(data1); //pass specific plant/state to update
+                })
+
+            // X axis
+            const x = d3.scaleBand()
+                .range([0, width])
+                .domain(data1.map(d => d.type)) // x axis labels
+                .padding(.2)
+            barsvg.append("g")
+                .attr("transform", `translate(0,${300})`)
+                .call(d3.axisBottom(x))
+
+            // Add Y axis
+            const y = d3.scaleLinear()
+                .domain([0, 20]) //label values
+                .range([300, 0])
+            barsvg.append("g")
+                //.attr("transform", `translate(-${width},0)`)
+                .attr("transform", `translate(${30},0)`)
+                .attr("class", "Yaxis")
+                .call(d3.axisLeft(y))
         })
 
 })();
