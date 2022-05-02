@@ -8,17 +8,10 @@
         d3.json("./topo.json"),
         d3.csv("./cities.csv")]).then((data) => {
 
-            var data1 = [
+            var data1 = [ //test bar data
                 { type: "consumption", value: 4 },
                 { type: "production", value: 16 }
             ];
-
-            MARGINS = {
-                top: 20,
-                right: 20,
-                bottom: 20,
-                left: 100 // change this to something larger like 100
-            }
 
             const width = 800;
             const height = 400;
@@ -94,8 +87,8 @@
                     .attr("x", d => x(d.type))
                     .attr("y", d => y(d.value))
                     .attr("width", x.bandwidth())
-                    .attr("height", d => 300 - y(d.value))
-                    .attr("fill", d => d.type == "consumption" ? "red" : "blue")
+                    .attr("height", d => 350 - y(d.value))
+                    .attr("fill", d => d.type == "consumption" ? "red" : "blue") //red for consumption blue otherwise
             }
 
             //statepoints
@@ -126,24 +119,36 @@
                     update(data1); //pass specific plant/state to update
                 })
 
+            //axes not appearing properly current fix: edit height/width + axisRight 
+            
             // X axis
             const x = d3.scaleBand()
                 .range([0, width])
                 .domain(data1.map(d => d.type)) // x axis labels
                 .padding(.2)
             barsvg.append("g")
-                .attr("transform", `translate(0,${300})`)
+                .attr("transform", `translate(0,${350})`) //reflect height here in y axis and bar update func above
                 .call(d3.axisBottom(x))
 
-            // Add Y axis
+            // Add Y axis 
             const y = d3.scaleLinear()
                 .domain([0, 20]) //label values
-                .range([300, 0])
+                .range([350, 0])
             barsvg.append("g")
-                //.attr("transform", `translate(-${width},0)`)
-                .attr("transform", `translate(${30},0)`)
                 .attr("class", "Yaxis")
-                .call(d3.axisLeft(y))
+                .call(d3.axisRight(y))
+                
+            barsvg.append('text') //x-axis
+                .attr('class', 'axis-title') //Optional: change font size and font weight
+                .attr('y', 350 + 25) //add to the bottom of graph (-25 to add it above axis)
+                .attr('x', width - 60) //add to the end of X-axis (-60 offsets the width of text)
+                .text('Type'); //actual text to display
+
+            barsvg.append('text') //y-axis
+                .attr('class', 'axis-title') //Optional: change font size and font weight
+                .attr('x', 10) //add some x padding to clear the y axis
+                .attr('y', 25) //add some y padding to align the end of the axis with the text
+                .text('CH4 Emission/Dollars/?'); 
         })
 
 })();
