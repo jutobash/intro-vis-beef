@@ -112,22 +112,22 @@
                     .attr("y", d => y(d.statecattle * 220))
                     .attr("width", x.bandwidth())
                     .attr("height", d => 350 - y(d.statecattle * 220))
-                    .attr("fill", "orange")   
+                    .attr("fill", "orange")
 
                 /*var textbar = barsvg.selectAll("bartext")
                     .data(data)
                 textbar.enter()
                     .append("text")
                     .transition().duration(1000)
+                    .attr("class", "bartext")
                     .attr("text-anchor", "middle")
                     .attr("x", 250)
                     .attr("y", d => (y(d.statecattle * 220)) - 3)
                     .text(function (d) { return (d.statecattle * 220) + (" LBs"); });
+                textbar.exit().remove();
 
-
-                    
-                textbar.exit().remove(); //not working*/
-                u.exit().remove();
+                //barsvg.selectAll("textbar").select("text").remove();
+                //textbar.exit().remove(); //not functional */
             }
 
             //statepoints
@@ -193,7 +193,7 @@
 
             // Add Y axis 
             const y = d3.scaleLinear()
-                .domain([0, 3200000000]) //label values
+                .domain([0, 3100000000]) //label values
                 .range([350, 0])
             barsvg.append("g")
                 .attr("class", "Yaxis")
@@ -201,8 +201,8 @@
 
             barsvg.append('text') //y-axis
                 .attr('class', 'axis-title') //Optional: change font size and font weight
-                .attr('x', 9) //add some x padding to clear the y axis
-                .attr('y', 12) //add some y padding to align the end of the axis with the text
+                .attr('x', 80) //add some x padding to clear the y axis
+                .attr('y', 15) //add some y padding to align the end of the axis with the text
                 .text('LBs Methane (CH4)');
         })
 
