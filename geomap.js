@@ -92,7 +92,7 @@
             }
             var mousemove = function (event, d) {
                 Tooltip
-                    .html(d.name + "<br>" + "Largest Plant: " + d.largestplant + "<br>" + "Cattle Count: " + d.statecattle) //add state, largestplantname, number of cattle per state
+                    .html("State: " + d.name + "<br>" + "Largest Plant: " + d.largestplant + "<br>" + "Cattle Count: " + d.statecattle) //add state, largestplantname, number of cattle per state
                     .style("left", (event.x) + "px")
                     .style("top", (event.y) - 90 + "px")
             }
