@@ -6,27 +6,51 @@
 
     Promise.all([
         d3.json("./topo.json"),
-        d3.csv("./cities.csv")]).then((data) => {
-
-            var data1 = [ //test bar data
-                { type: "consumption", value: 4 },
-                { type: "production", value: 16 }
-            ];
-
-            const width = 800;
+        d3.csv("./plants.csv")]).then((data) => {
+            
+            const width = 500;
             const height = 400;
             const topology = data[0]; //we will keep topology
-            const cities = data[1]; //cities will be changed to include information on state plants
+            const plants = data[1]; //cities will be changed to include information on state plants
 
-            //console.log(cities);
+            var data1 = [{
+                statecattle: 2700000
+            }]
+            var data2 = [{
+                statecattle: 4000000
+            }]
+            var data3 = [{
+                statecattle: 6550000
+            }]
+            var data4 = [{
+                statecattle: 4310000
+            }]
+            var data5 = [{
+                statecattle: 6850000
+            }]
+            var data6 = [{
+                statecattle: 5300000
+            }]
+            var data7 = [{
+                statecattle: 4000000
+            }]
+            var data8 = [{
+                statecattle: 13100000
+            }]
+            var data9 = [{
+                statecattle: 3450000
+            }]
+            var data10 = [{
+                statecattle: 5150000
+            }]
 
-            var heats = d3.scaleSequential() //will be based on state emmission stat
-                .domain([1, 50])
+            var heats = d3.scaleSequential() //needs: emmission stat
+                .domain([594000000, 2882000000])
                 .range(["yellow", "red"]);
 
             var radius = d3.scaleSequential() // redundant encoding emmission stat
-                .domain([1, 50])
-                .range([1, 10]);
+                .domain([594000000, 2882000000])
+                .range([10, 30]);
 
             var projection = d3.geoAlbersUsa().scale(700).translate([width / 2, height / 2])
 
@@ -36,7 +60,7 @@
 
             const svg = d3.select("#geoCanvas").append('svg').attr("width", width).attr("height", height).attr('transform', 'translate(50,50)');
 
-            const barsvg = d3.select("#geoCanvas").append('svg').attr("width", width).attr("height", height);
+            const barsvg = d3.select("#geoCanvas").append('svg').attr("width", width).attr("height", height).attr('transform', 'translate(50,50)');
 
             //usmap
             svg.append("g")
@@ -67,7 +91,7 @@
             }
             var mousemove = function (event, d) {
                 Tooltip
-                    .html(d.name)
+                    .html(d.name) //add state, largestplantname, number of cattle per state
                     .style("left", (event.x) + "px")
                     .style("top", (event.y) - 50 + "px")
             }
@@ -76,30 +100,29 @@
             }
 
             function update(data) { //updates bar graph based on point clicked
-
                 var u = barsvg.selectAll("rect")
                     .data(data)
-
                 u
                     .join("rect")
                     .transition()
                     .duration(1000)
-                    .attr("x", d => x(d.type))
-                    .attr("y", d => y(d.value))
+                    .attr("x", 100)
+                    .attr("y", d => y(d.statecattle * 220))
                     .attr("width", x.bandwidth())
-                    .attr("height", d => 350 - y(d.value))
-                    .attr("fill", d => d.type == "consumption" ? "red" : "blue") //red for consumption blue otherwise
+                    .attr("height", d => 350 - y(d.statecattle * 220))
+                    .attr("fill", "green") 
             }
 
             //statepoints
             svg.selectAll("circle")
-                .data(cities)
+                .data(plants)
                 .join("circle")
                 .attr("class", "circle")
                 .attr("stroke", "khaki")
                 .attr("stroke-width", "2px")
-                .attr("r", function () { //double encoded based on emission
-                    return radius(Math.floor(Math.random() * 50));
+                .attr("r", function (d) { //pass emmision value
+                    console.log(d.statecattle * 220)
+                    return radius(d.statecattle * 220);
                 })
                 .attr("cx", function (d) { //change lat long for plant locs
                     var lon = projection([d.longitude, d.latitude]);
@@ -109,14 +132,35 @@
                     var lat = projection([d.longitude, d.latitude]);
                     return lat[1];
                 })
-                .attr("fill", function () { // squale sequential based on emission double encoded with "r"
-                    return heats(Math.floor(Math.random() * 50));
+                .attr("fill", function (d) { // squale sequential based on emission double encoded with "r"
+                    return heats(d.statecattle * 220);
                 })
                 .on("mouseover", mouseover)
                 .on("mousemove", mousemove)
                 .on("mouseleave", mouseleave)
-                .on("click", function () { // change data to data.name of the circle
-                    update(data1); //pass specific plant/state to update
+                .on("click", function (d) { 
+                    if (d.target.__data__.name == "California") {
+                        update(data10);
+                    } else if (d.target.__data__.name == "Colorado") {
+                        update(data1);
+                    } else if (d.target.__data__.name == "Iowa") {
+                        update(data2);
+                    } else if (d.target.__data__.name == "Kansas") {
+                        update(data3);
+                    } else if (d.target.__data__.name == "Missouri") {
+                        update(data4);
+                    } else if (d.target.__data__.name == "Nebraska") {
+                        update(data5);
+                    } else if (d.target.__data__.name == "Oklahoma") {
+                        update(data6);
+                    } else if (d.target.__data__.name == "South Dakota") {
+                        update(data7);
+                    } else if (d.target.__data__.name == "Texas") {
+                        update(data8);
+                    } else {
+                        update(data9);
+                    }
+                    //update(d.target.__data__); //not working unsure why
                 })
 
             //axes not appearing properly current fix: edit height/width + axisRight 
@@ -124,7 +168,7 @@
             // X axis
             const x = d3.scaleBand()
                 .range([0, width])
-                .domain(data1.map(d => d.type)) // x axis labels
+                .domain(["CH4 Emission (LBs)"]) // x axis labels
                 .padding(.2)
             barsvg.append("g")
                 .attr("transform", `translate(0,${350})`) //reflect height here in y axis and bar update func above
@@ -132,23 +176,17 @@
 
             // Add Y axis 
             const y = d3.scaleLinear()
-                .domain([0, 20]) //label values
+                .domain([0, 3200000000]) //label values
                 .range([350, 0])
             barsvg.append("g")
                 .attr("class", "Yaxis")
                 .call(d3.axisRight(y))
-                
-            barsvg.append('text') //x-axis
-                .attr('class', 'axis-title') //Optional: change font size and font weight
-                .attr('y', 350 + 25) //add to the bottom of graph (-25 to add it above axis)
-                .attr('x', width - 60) //add to the end of X-axis (-60 offsets the width of text)
-                .text('Type'); //actual text to display
 
             barsvg.append('text') //y-axis
                 .attr('class', 'axis-title') //Optional: change font size and font weight
-                .attr('x', 10) //add some x padding to clear the y axis
-                .attr('y', 25) //add some y padding to align the end of the axis with the text
-                .text('CH4 Emission/Dollars/?'); 
+                .attr('x', 9) //add some x padding to clear the y axis
+                .attr('y', 12) //add some y padding to align the end of the axis with the text
+                .text('LBs Methane (CH4)'); 
         })
 
 })();
