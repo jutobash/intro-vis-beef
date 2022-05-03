@@ -7,8 +7,8 @@
     Promise.all([
         d3.json("./topo.json"),
         d3.csv("./plants.csv")]).then((data) => {
-            
-            const width = 500;
+
+            const width = 550;
             const height = 400;
             const topology = data[0]; //we will keep topology
             const plants = data[1]; //cities will be changed to include information on state plants
@@ -85,32 +85,46 @@
                 .style("border-radius", "5px")
                 .style("padding", "5px")
 
+
             //Tooltip mouse funcs
             const mouseover = function (event, d) {
                 Tooltip.style("opacity", 1)
             }
             var mousemove = function (event, d) {
                 Tooltip
-                    .html(d.name) //add state, largestplantname, number of cattle per state
+                    .html(d.name + "<br>" + "Largest Plant: " + d.largestplant + "<br>" + "Cattle Count: " + d.statecattle) //add state, largestplantname, number of cattle per state
                     .style("left", (event.x) + "px")
-                    .style("top", (event.y) - 50 + "px")
+                    .style("top", (event.y) - 90 + "px")
             }
             var mouseleave = function (event, d) {
                 Tooltip.style("opacity", 0)
             }
 
-            function update(data) { //updates bar graph based on point clicked
+            function update(data) { //updates bar graph based on point clicked'
+
                 var u = barsvg.selectAll("rect")
                     .data(data)
                 u
                     .join("rect")
                     .transition()
                     .duration(1000)
-                    .attr("x", 100)
+                    .attr("x", 85)
                     .attr("y", d => y(d.statecattle * 220))
                     .attr("width", x.bandwidth())
                     .attr("height", d => 350 - y(d.statecattle * 220))
-                    .attr("fill", "green") 
+                    .attr("fill", "green")   
+
+                var textbar = barsvg.selectAll(".bartext")
+                    .data(data)
+                textbar.enter()
+                    .append("text")
+                    .transition().duration(1000)
+                    .attr("text-anchor", "middle")
+                    .attr("x", 250)
+                    .attr("y", d => (y(d.statecattle * 220)) - 3)
+                    .text(function (d) { return (d.statecattle * 220) + (" LBs"); })
+                    
+                textbar.exit().remove();
             }
 
             //statepoints
@@ -138,7 +152,7 @@
                 .on("mouseover", mouseover)
                 .on("mousemove", mousemove)
                 .on("mouseleave", mouseleave)
-                .on("click", function (d) { 
+                .on("click", function (d) {
                     if (d.target.__data__.name == "California") {
                         update(data10);
                     } else if (d.target.__data__.name == "Colorado") {
@@ -164,11 +178,11 @@
                 })
 
             //axes not appearing properly current fix: edit height/width + axisRight 
-            
+
             // X axis
             const x = d3.scaleBand()
                 .range([0, width])
-                .domain(["CH4 Emission (LBs)"]) // x axis labels
+                .domain(["Ranch Emissions"]) // x axis labels
                 .padding(.2)
             barsvg.append("g")
                 .attr("transform", `translate(0,${350})`) //reflect height here in y axis and bar update func above
@@ -186,7 +200,7 @@
                 .attr('class', 'axis-title') //Optional: change font size and font weight
                 .attr('x', 9) //add some x padding to clear the y axis
                 .attr('y', 12) //add some y padding to align the end of the axis with the text
-                .text('LBs Methane (CH4)'); 
+                .text('LBs Methane (CH4)');
         })
 
 })();

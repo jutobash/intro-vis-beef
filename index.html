@@ -2,6 +2,7 @@
 <html>
 
 <head>
+    <title>Beef Ranch Visual</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- import D3 Version 6 here or at the end of the body -->
@@ -22,12 +23,28 @@
     <style>
         svg {
             padding: 20px;
+            padding-top: 40px;
+        }
+
+        #title {
+            position: absolute;
+            top: 20px;
+            left: 400px;
+        }
+
+        #maptitle {
+            position: absolute;
+            top: 100px;
+            left: 200px;
         }
 
         .circle:hover {
             stroke: black;
         }
     </style>
+
+    <h1 id = "title">Cattle Ranch Emission Visualization</h1>
+    <h4 id = "maptitle">10 Largest Ranches in The US</h4>
 
 </body>
 
