@@ -112,9 +112,9 @@
                     .attr("y", d => y(d.statecattle * 220))
                     .attr("width", x.bandwidth())
                     .attr("height", d => 350 - y(d.statecattle * 220))
-                    .attr("fill", "green")   
+                    .attr("fill", "orange")   
 
-                var textbar = barsvg.selectAll(".bartext")
+                /*var textbar = barsvg.selectAll("bartext")
                     .data(data)
                 textbar.enter()
                     .append("text")
@@ -122,9 +122,12 @@
                     .attr("text-anchor", "middle")
                     .attr("x", 250)
                     .attr("y", d => (y(d.statecattle * 220)) - 3)
-                    .text(function (d) { return (d.statecattle * 220) + (" LBs"); })
+                    .text(function (d) { return (d.statecattle * 220) + (" LBs"); });
+
+
                     
-                textbar.exit().remove();
+                textbar.exit().remove(); //not working*/
+                u.exit().remove();
             }
 
             //statepoints
